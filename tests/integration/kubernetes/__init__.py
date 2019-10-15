@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,17 +16,3 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-set -e
-
-export DEBIAN_FRONTEND=noninteractive
-
-apt-get update
-apt-get install -y --no-install-recommends curl gnupg2
-
-curl -sL https://deb.nodesource.com/setup_8.x | bash -
-
-apt-get update
-apt-get install -y --no-install-recommends git nodejs
-pip install GitPython
-python setup.py compile_assets sdist -q
