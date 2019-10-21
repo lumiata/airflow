@@ -673,7 +673,8 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
                 return self.kube_client.create_namespaced_secret(
                     self.kube_config.executor_namespace, kubernetes.client.V1Secret(
                         data={
-                            'key.json': base64.b64encode(open(secret_path, 'rb').read())},
+                            'key.json': base64.b64encode(
+                                open(secret_path, 'rb').read()).decode('UTF-8')},
                         metadata=kubernetes.client.V1ObjectMeta(name=secret_name)),
                     **self.kube_config.kube_client_request_args)
             except ApiException as e:
@@ -682,7 +683,7 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
                         secret_name, self.kube_config.executor_namespace,
                         kubernetes.client.V1Secret(
                             data={'key.json': base64.b64encode(
-                                open(secret_path, 'rb').read())},
+                                open(secret_path, 'rb').read()).decode('UTF-8')},
                             metadata=kubernetes.client.V1ObjectMeta(name=secret_name)),
                         **self.kube_config.kube_client_request_args)
                 self.log.exception(
