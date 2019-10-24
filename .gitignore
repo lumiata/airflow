@@ -30,7 +30,6 @@ __pycache__/
 env/
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -144,7 +143,6 @@ scripts/ci/kubernetes/kube/.generated/airflow.yaml
 *.entry.js
 node_modules
 npm-debug.log*
-static/dist
 derby.log
 metastore_db
 
