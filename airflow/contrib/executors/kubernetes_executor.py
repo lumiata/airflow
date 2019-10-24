@@ -127,6 +127,9 @@ class KubeConfig:
         self.core_configuration = configuration_dict['core']
         self.kube_secrets = configuration_dict.get('kubernetes_secrets', {})
         self.kube_env_vars = configuration_dict.get('kubernetes_environment_variables', {})
+        # MAKE ENV VARIABLES UPPERCASE
+        for key, value in self.kube_env_vars.items():
+            self.kube_env_vars[key.upper()] = value
         self.env_from_configmap_ref = configuration.get(self.kubernetes_section,
                                                         'env_from_configmap_ref')
         self.env_from_secret_ref = configuration.get(self.kubernetes_section,
