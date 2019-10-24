@@ -17,28 +17,30 @@
 
 import base64
 import hashlib
-import re
 import json
 import multiprocessing
+import re
 from queue import Queue
-from dateutil import parser
 from uuid import uuid4
+
 import kubernetes
+from dateutil import parser
 from kubernetes import watch, client
 from kubernetes.client.rest import ApiException
+
+from airflow import configuration, settings
 from airflow.configuration import conf
-from airflow.contrib.kubernetes.pod_launcher import PodLauncher
 from airflow.contrib.kubernetes.kube_client import get_kube_client
+from airflow.contrib.kubernetes.pod_launcher import PodLauncher
 from airflow.contrib.kubernetes.worker_configuration import WorkerConfiguration
-from airflow.executors.base_executor import BaseExecutor
+from airflow.exceptions import AirflowConfigException, AirflowException
 from airflow.executors import Executors
+from airflow.executors.base_executor import BaseExecutor
 from airflow.models import TaskInstance
 from airflow.models.kubernetes import KubeResourceVersion, KubeWorkerIdentifier
-from airflow.utils.state import State
 from airflow.utils.db import provide_session, create_session
-from airflow import configuration, settings
-from airflow.exceptions import AirflowConfigException, AirflowException
 from airflow.utils.log.logging_mixin import LoggingMixin
+from airflow.utils.state import State
 
 
 class KubernetesExecutorConfig:
@@ -657,8 +659,8 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
             try:
                 return self.kube_client.create_namespaced_secret(
                     self.kube_config.executor_namespace, kubernetes.client.V1Secret(
-                        data={
-                            'key.json': base64.b64encode(open(secret_path, 'r').read())},
+                        data={'key.json': base64.b64encode(
+                                open(secret_path, 'rb').read()).decode('UTF-8')},
                         metadata=kubernetes.client.V1ObjectMeta(name=secret_name)))
             except ApiException as e:
                 if e.status == 409:
@@ -666,7 +668,7 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
                         secret_name, self.kube_config.executor_namespace,
                         kubernetes.client.V1Secret(
                             data={'key.json': base64.b64encode(
-                                open(secret_path, 'r').read())},
+                                    open(secret_path, 'rb').read()).decode('UTF-8')},
                             metadata=kubernetes.client.V1ObjectMeta(name=secret_name)))
                 self.log.exception(
                     'Exception while trying to inject secret. '
