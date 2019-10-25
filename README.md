@@ -17,8 +17,27 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Apache Airflow
+# Lumi Airflow
+This is a fork of Apache Airflow version 1.10.3 
+(git commit hash=c4a7d2bc38175a747e09c56b63f0b2de94d681bc; tag=1.10.3post2)
 
+The reason for this fork is that there are bugs in the official release of 
+Airflow that we need fixed for our implementation.
+
+Current Change Log:
+- add 'dist' folder to lumi-airflow/airflow/www_rbac/static <br>
+  Reason: this folder contains information that allows the Web UI Javascript to 
+  render, and is included in the packaged pypi version of Airflow but is ignored 
+  in github<br>
+  Notes: the folder is copied straight from the same location in the pip 
+  installed `apache-airflow==1.10.3`
+- make K8s environment variables uppercase in KubeConfig
+  Reason: because of the package that airflow uses to parse the 'airflow.cfg' 
+  file, all keys are automatically lowercased. In order to allow environment
+  variables to be uppercase inside the K8s pod (i.e. GOOGLE_APPLICATION_CREDENTIALS), 
+  we make uppercase copies of all environment variables passed in to the 
+  'kubernetes_environment_variables' section
+--------------------------------------------------------------------------------
 [![PyPI version](https://badge.fury.io/py/apache-airflow.svg)](https://badge.fury.io/py/apache-airflow)
 [![Build Status](https://travis-ci.org/apache/airflow.svg?branch=master)](https://travis-ci.org/apache/airflow)
 [![Coverage Status](https://img.shields.io/codecov/c/github/apache/airflow/master.svg)](https://codecov.io/github/apache/airflow?branch=master)
