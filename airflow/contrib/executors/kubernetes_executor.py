@@ -17,28 +17,30 @@
 
 import base64
 import hashlib
-import re
 import json
 import multiprocessing
+import re
 from queue import Queue
-from dateutil import parser
 from uuid import uuid4
+
 import kubernetes
+from dateutil import parser
 from kubernetes import watch, client
 from kubernetes.client.rest import ApiException
+
+from airflow import configuration, settings
 from airflow.configuration import conf
-from airflow.contrib.kubernetes.pod_launcher import PodLauncher
 from airflow.contrib.kubernetes.kube_client import get_kube_client
+from airflow.contrib.kubernetes.pod_launcher import PodLauncher
 from airflow.contrib.kubernetes.worker_configuration import WorkerConfiguration
-from airflow.executors.base_executor import BaseExecutor
+from airflow.exceptions import AirflowConfigException, AirflowException
 from airflow.executors import Executors
+from airflow.executors.base_executor import BaseExecutor
 from airflow.models import TaskInstance
 from airflow.models.kubernetes import KubeResourceVersion, KubeWorkerIdentifier
-from airflow.utils.state import State
 from airflow.utils.db import provide_session, create_session
-from airflow import configuration, settings
-from airflow.exceptions import AirflowConfigException, AirflowException
 from airflow.utils.log.logging_mixin import LoggingMixin
+from airflow.utils.state import State
 
 
 class KubernetesExecutorConfig:
@@ -125,6 +127,9 @@ class KubeConfig:
         self.core_configuration = configuration_dict['core']
         self.kube_secrets = configuration_dict.get('kubernetes_secrets', {})
         self.kube_env_vars = configuration_dict.get('kubernetes_environment_variables', {})
+        # MAKE UPPERCASE COPY OF ALL ENV VARIABLES
+        for key, value in self.kube_env_vars.items():
+            self.kube_env_vars[key.upper()] = value
         self.env_from_configmap_ref = configuration.get(self.kubernetes_section,
                                                         'env_from_configmap_ref')
         self.env_from_secret_ref = configuration.get(self.kubernetes_section,
