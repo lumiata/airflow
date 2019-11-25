@@ -41,6 +41,7 @@ from airflow.models.kubernetes import KubeResourceVersion, KubeWorkerIdentifier
 from airflow.utils.db import provide_session, create_session
 from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.utils.state import State
+from copy import deepcopy
 
 
 class KubernetesExecutorConfig:
@@ -128,7 +129,8 @@ class KubeConfig:
         self.kube_secrets = configuration_dict.get('kubernetes_secrets', {})
         self.kube_env_vars = configuration_dict.get('kubernetes_environment_variables', {})
         # MAKE UPPERCASE COPY OF ALL ENV VARIABLES
-        for key, value in self.kube_env_vars.items():
+        orig_kube_vars = deepcopy(self.kube_env_vars)
+        for key, value in orig_kube_vars.items():
             self.kube_env_vars[key.upper()] = value
         self.env_from_configmap_ref = configuration.get(self.kubernetes_section,
                                                         'env_from_configmap_ref')
